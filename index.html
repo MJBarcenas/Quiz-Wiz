@@ -1,0 +1,107 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" defer></script>
+    <script src="js/index.js" defer></script>
+    <script src="https://kit.fontawesome.com/aa188ef300.js" crossorigin="anonymous"></script>
+    <title>Quiz Wiz | Michael Justin Barcenas</title>
+</head>
+
+<body>
+    <div class="body">
+        <nav class="nav">
+            <h1><span>Quiz</span> Wiz</h1>
+        </nav>
+        <div class="content">
+            <div class="home-screen">
+                <aside class="categories">
+                    <ul id="category-list">
+                    </ul>
+                </aside>
+                <header class="header">
+                    <div class="difficulty">
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="type">
+                        <select id="type">
+                            <option value="multiple">Multiple Choice</option>
+                            <option value="boolean">True or False</option>
+                        </select>
+                    </div>
+                    <div class="quantity">
+                        <input id="quantity" type="number" placeholder="questions quantity" value="10">
+                    </div>
+                    <div class="header-button">
+                        <button id="start-button">Start</button>
+                    </div>
+                </header>
+                <div class="default-value">
+                    <p>Choose a topic from the sidebar and if you are okay with the settings at the top, press <span>start</span> and be a <span>quiz wizard!</span></p>
+                </div>
+                <div class="quiz">
+                    <header>
+                        <div class="quiz-title">
+                            <p id="quiz-title"></p>
+                        </div>
+                        <div class="progress">
+                            <p><span id="quiz-progress"></span>/<span id="quiz-total"></span></p>
+                        </div>
+                    </header>
+                    <div class="question">
+                        <p id="question">
+                            How many stars are there in the solar system?
+                        </p>
+                        <div class="question-choices">
+                            <button>A. Sun</button>
+                            <button>B. Mars</button>
+                            <button>C. Earth</button>
+                            <button>D. Sagitarius A*</button>
+                        </div>
+                    </div>
+                    <div class="question-buttons">
+                        <button id="quit-button">Quit</button>
+                        <button id="next-button">Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="leaderboards">
+            </div>
+        </div>
+        <div class="contacts">
+            <a href="https://www.facebook.com/Imaqtchael" target="_blank">
+                <div class="links">
+                    <i class="fa-brands fa-facebook-f"></i>
+                    <p>Facebook</p>
+                </div>
+            </a>
+            <a href="http://www.linkedin.com" target="_blank">
+                <div class="links"><i class="fa-brands fa-linkedin-in"></i>
+                    <p>LinkedIn</p>
+                </div>
+            </a>
+            <a href="http://www.github.com/MJBarcenas" target="_blank">
+                <div class="links"><i class="fa-brands fa-github"></i>
+                    <p>Github</p>
+                </div>
+            </a>
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=mjbarcenas.official@gmail.com" target="_blank">
+                <div class="links"><i class="fa-solid fa-envelope"></i>
+                    <p>Gmail</p>
+                </div>
+            </a>
+        </div>
+        <footer>
+            <p>Project by: Michael Justin Barcenas</p>
+        </footer>
+    </div>
+</body>
+
+</html>
