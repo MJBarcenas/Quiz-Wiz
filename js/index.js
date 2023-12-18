@@ -132,8 +132,19 @@ typeSelect.addEventListener("change", () => {
 let quantityInput = document.querySelector("#quantity");
 quantityInput.addEventListener("change", () => {
     let quantity = quantityInput.value;
-    quizConfig.quantity = quantity;
+    if (quantity > 50) {
+        quantityInput.value = 50;
+        quizConfig.quantity = 50;
+    } else {
+        quizConfig.quantity = quantity;
+    }
 });
+quantityInput.addEventListener("keydown", (event) => {
+    if (event.key == "-" || event.key == "+") {
+        event.preventDefault();
+        return;
+    }
+})
 
 let questionChoices = document.querySelector("#question-choices");
 questionChoices.addEventListener("click", event => {

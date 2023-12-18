@@ -79,6 +79,12 @@ nav span {
     gap: .5rem;
 }
 
+.home-screen>div:first-child {
+    border-radius: 5px;
+    background-color: var(--tertiary-color);
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px 0px, rgba(17, 17, 26, 0.05) 0px 8px 32px 0px;
+}
+
 .categories {
     max-height: 40rem;
     grid-row: 2/2;
@@ -144,12 +150,12 @@ nav span {
 
 .header button#start-button {
     color: var(--background-color);
-    background-color: var(--tertiary-color);
+    background-color: var(--secondary-color);
 }
 
 .header button#start-button:hover {
     cursor: pointer;
-    background-color: var(--secondary-color);
+    background-color: var(--sub-color);
 }
 
 .header button#start-button:active {
