@@ -157,7 +157,7 @@ nav span {
 }
 
 .default-value {
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     font-size: 2rem;
@@ -175,7 +175,7 @@ nav span {
 
 .quiz {
     padding: 1rem;
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -195,20 +195,21 @@ nav span {
     color: var(--text-color);
     font-size: 1.5rem;
     font-weight: bold;
+    text-align: center;
 }
 
 .question {
     margin-top: 10rem;
 }
 
-.question-choices {
+#question-choices {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-top: 10rem;
 }
 
-.question-choices>button {
+#question-choices>button {
     border: none;
     outline: none;
     padding: .5rem 1rem;
@@ -217,8 +218,8 @@ nav span {
     color: var(--background-color);
 }
 
-.question-choices>button:hover,
-.question-choices>button:focus {
+#question-choices>button:hover,
+#question-choices>button:focus {
     cursor: pointer;
     background-color: var(--secondary-color);
 }

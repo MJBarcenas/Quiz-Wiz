@@ -1,4 +1,4 @@
-let token;
+let token, currentCategory, score, quizList, currentQuestion;
 let quizConfig = {
     categoryID: null,
     category: null,
@@ -6,8 +6,6 @@ let quizConfig = {
     type: "multiple",
     quantity: 10
 };
-
-let currentCategory = null;
 
 function initialize() {
     // Generate token and get the available topics fromt eh api
@@ -37,6 +35,38 @@ function initialize() {
     });
 }
 
+function shuffle(array) {
+    let currentIndex = array.length,
+        randomIndex;
+
+    while (currentIndex > 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]
+        ];
+    }
+
+    return array;
+}
+
+function displayQuiz(quizNum) {
+    let questionElement = document.querySelector("#question");
+    questionElement.innerHTML = quizList[quizNum].question;
+
+    let questionButton = document.querySelector("#question-choices");
+    let shuffledChoices = shuffle([quizList[quizNum].correct_answer, ...quizList[quizNum].incorrect_answers]);
+    let choicesButton = shuffledChoices.map(choice => {
+        let choiceButton = document.createElement("button");
+        choiceButton.innerHTML = choice;
+        return choiceButton;
+    });
+
+    questionButton.innerHTML = "";
+    questionButton.append(...choicesButton);
+}
+
 let categoryList = document.querySelector("#category-list");
 categoryList.addEventListener("click", (event) => {
     let target = event.target;
@@ -62,11 +92,16 @@ startButton.addEventListener("click", () => {
     $.get(`https://opentdb.com/api.php?category=${quizConfig.categoryID}&difficulty=${quizConfig.difficulty}&type=${quizConfig.type}&amount=${quizConfig.quantity}`, function(result) {
         console.log(result);
         if (result.response_code == 0) {
+            quizList = result.results;
+            currentQuestion = 0;
+            score = 0;
+            displayQuiz(currentQuestion);
+
             let quizTitle = document.querySelector("#quiz-title");
             quizTitle.textContent = quizConfig.category;
 
             let quizProgress = document.querySelector("#quiz-progress");
-            quizProgress.textContent = 0;
+            quizProgress.textContent = score;
 
             let quizTotal = document.querySelector("#quiz-total");
             quizTotal.textContent = quizConfig.quantity;
@@ -98,6 +133,23 @@ let quantityInput = document.querySelector("#quantity");
 quantityInput.addEventListener("change", () => {
     let quantity = quantityInput.value;
     quizConfig.quantity = quantity;
+});
+
+let questionChoices = document.querySelector("#question-choices");
+questionChoices.addEventListener("click", event => {
+    if (event.target.tagName.toLowerCase() == "button") {
+        let pressedAnswer = event.target.textContent;
+        let answer = quizList[currentQuestion].correct_answer;
+        let scoreSpan = document.querySelector("#quiz-progress");
+
+        if (pressedAnswer == answer) {
+            score += 1;
+        }
+        scoreSpan.textContent = score;
+        currentQuestion += 1;
+
+        displayQuiz(currentQuestion);
+    }
 });
 
 initialize();
