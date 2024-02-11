@@ -17,7 +17,7 @@ dropDowns.forEach(button => {
     });
     let dropDownContent = button.nextElementSibling;
     dropDownContent.addEventListener("click", function(event) {
-
+        let event = null; // Tuloy mo dito
     });
 });
 
