@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+:root {
+    --primary-backgroundcolor: #f3faf5;
+    --primary-color: #023047;
+    --secondary-color: #219ebc;
+    --tertiary-color: #ffb703;
+    --text-color: #3c3c3c;
+    --header-size: 2rem;
+    --text-size: 1rem;
+    --small-text-size: .8rem;
+    --big-roundness: 8px;
+    --xs-roundness: 4px;
+}
+
+* {
+    font-family: "Poppins";
+    font-size: var(--text-size);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    color: var(--text-color);
+    /* border: 1px solid red; */
+    background-color: var(--primary-backgroundcolor);
+}
+
+.button-control {
+    padding: .3rem 1rem;
+    background-color: var(--tertiary-color);
+    color: white;
+    border-radius: var(--xs-roundness);
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.button-control:hover {
+    opacity: .9;
+}
+
+.dropdown-button {
+    padding: .3rem 1rem;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.dropdown-button:hover {
+    opacity: .9;
+}
+
+.dropdown-button i {
+    background-color: inherit;
+    color: inherit;
+}
+
+.textbox-control {
+    padding: .3rem 1rem;
+    background-color: var(--primary-backgroundcolor);
+    color: var(--text-color);
+    border: none;
+    outline: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: none;
+}
+
+
+/* BODY */
+
+.body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    max-width: 1250px;
+    padding: 1rem;
+    margin: 0 auto;
+}
+
+
+/* HEADER */
+
+header {
+    display: flex;
+    flex-direction: row;
+    flex: 0 1 auto;
+}
+
+
+/* LOGO */
+
+.logo * {
+    font-size: var(--header-size);
+    font-weight: bolder;
+}
+
+.logo p {
+    color: var(--primary-color);
+}
+
+.logo span {
+    color: var(--secondary-color);
+}
+
+
+/* NAV-BUTTONS */
+
+.nav-buttons {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-buttons>button {
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+
+.nav-buttons>button:hover>i {
+    color: var(--secondary-color);
+    opacity: .8;
+}
+
+
+/* MAIN */
+
+main {
+    flex: 1 1 auto
+}
+
+
+/* QUIZ-SETTINGS */
+
+.quiz-settings {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 1rem;
+    background-color: var(--primary-color);
+    border-radius: var(--big-roundness);
+}
+
+.quiz-settings>div {
+    position: relative;
+}
+
+.quiz-settings>div>div {
+    position: absolute;
+    display: grid;
+    width: max-content;
+    display: none;
+}
+
+.quiz-settings>div>div>span {
+    padding: .3rem .5rem;
+    outline: 1px solid var(--text-color);
+    line-height: var(--text-color);
+    cursor: pointer;
+}
+
+.quiz-settings>div>div>span:hover {
+    background-color: var(--tertiary-color);
+    color: black;
+}
+
+
+/* CONTACTS */
+
+.contacts {
+    display: grid;
+    grid-template-columns: 10rem 10rem;
+    width: fit-content;
+    column-gap: 1rem;
+    row-gap: .5rem;
+}
+
+.contacts a {
+    text-decoration: none;
+}
+
+.links {
+    display: flex;
+    align-items: center;
+}
+
+.links:hover>i,
+.links:hover>p {
+    cursor: pointer;
+    color: var(--secondary-color);
+}
+
+.links i {
+    margin-right: .5rem;
+    height: 1rem;
+    width: 1rem;
+}
+
+.links p {
+    font-size: var(--small-text-size);
+}
+
+
+/* FOOTER */
+
+footer {
+    flex: 0 1 fit-content;
+    width: 100%;
+    text-align: center;
+}
