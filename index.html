@@ -24,35 +24,132 @@
         <main>
             <div class="quiz-settings">
                 <div class="subject-options">
-                    <button class="dropdown-button">Subject <i class="fa-solid fa-chevron-down"></i></button>
-                    <div>
-                        <span>Music</span>
-                        <span>Science</span>
-                        <span>Mathematics</span>
-                        <span>Arts</span>
-                        <span>Computer Technology</span>
-                        <span>History</span>
-                        <span>Aesthetics</span>
+                    <button class="dropdown-button" id="subject-button">Subject <i class="fa-solid fa-chevron-down"></i></button>
+                    <div id="subject-options">
                     </div>
                 </div>
                 <div class="difficulty-options">
-                    <button class="dropdown-button">Difficulty <i class="fa-solid fa-chevron-down"></i></button>
-                    <div>
-                        <span>Easy</span>
-                        <span>Hard</span>
+                    <button class="dropdown-button" id="difficulty-button">Difficulty <i class="fa-solid fa-chevron-down"></i></button>
+                    <div id="difficulty-options">
+                        <span topic-difficulty="easy">Easy</span>
+                        <span topic-difficulty="medium">Medium</span>
+                        <span topic-difficulty="hard">Hard</span>
                     </div>
                 </div>
                 <div class="type-options">
-                    <button class="dropdown-button">Type <i class="fa-solid fa-chevron-down"></i></button>
-                    <div>
-                        <span>Multiple Choice</span>
-                        <span>True or False</span>
+                    <button class="dropdown-button" id="type-button">Type <i class="fa-solid fa-chevron-down"></i></button>
+                    <div id="type-options">
+                        <span topic-type="multiple">Multiple Choice</span>
+                        <span topic-type="boolean">True or False</span>
                     </div>
                 </div>
-                <input type="number" class="textbox-control" numeric>
+                <input type="number" id="quiz-count" class="textbox-control" numeric value="10">
                 <button class="button-control" id="start-quiz-button">Start</button>
             </div>
-            <div class="quiz-body"></div>
+            <div class="quiz-home">
+                <p>Welcome to <span>Quiz</span> <span>Wiz!</span> To start, fill up the details above and hit <span>start</span>.</p>
+            </div>
+            <div class="quiz-body" id="quiz-body" style="display: none;">
+                <div class="quiz-heading">
+                    <div class="subject-title">
+                        <p><span id="subject">Science</span> - <span class="hard" id="subject-difficulty">Hard</span></p>
+                    </div>
+                    <div class="score">
+                        <p><span id="quiz-score">10</span> / <span id="quiz-total">10</span></p>
+                    </div>
+                </div>
+                <div class="question">
+                    <p id="quiz-question">1. What is the number of planets in the solar system?</p>
+                </div>
+                <div class="choices" id="quiz-choices">
+                    <button>A. True</button>
+                    <button>A. False</button>
+                    <button>A. True</button>
+                    <button>A. False</button>
+                </div>
+            </div>
+            <div class="quiz-summary" id="quiz-summary">
+                <div class="summary-heading">
+                    <div class="summary-title">Summary: <span id="summary-subject"></span>[<span id="summary-subject-difficulty"></span>]</div>
+                    <div class="summary-score"><span id="summary-score"></span> / <span id="summary-total-question"></span></div>
+                </div>
+                <div class="summary-body">
+                    <div class="question-logs" id="question-logs">
+                        <div class="question-log">
+                            <p>1. What is the biggest star in the universe?</p>
+                            <p>Your Answer: <span class="wrong">Sun</span></p>
+                            <p>Correct Answer: <span class="correct">Sun</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                        <div class="question-log">
+                            <p><span>1. What is the biggest star in the universe? </span></p>
+                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="next-button-div">
+                    <button id="quiz-next-button" class="button-control">Next</button>
+                </div>
+            </div>
         </main>
         <div class="contacts">
             <a href="https://www.facebook.com/Imaqtchael" target="_blank">
