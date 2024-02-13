@@ -8,7 +8,7 @@ const firebaseSettings = {
 const app = initializeApp(firebaseSettings);
 const database = getDatabase(app);
 
-let sessionToken;
+let sessionToken, sessionUser;
 let playerDetails = {
     totalCorrect: 0,
     totalWrong: 0,
@@ -55,7 +55,9 @@ async function getSessionToken() {
 }
 
 async function getQuestion() {
-    let request = await fetch(`https://opentdb.com/api.php?difficulty=${requestDetails.difficulty}&type=${requestDetails.type}&amount=${requestDetails.quantity}&token=${sessionToken}`);
+    // let request = await fetch(`https://opentdb.com/api.php?difficulty=${requestDetails.difficulty}&type=${requestDetails.type}&amount=${requestDetails.quantity}&token=${sessionToken}`);
+    console.log(`https://opentdb.com/api.php?amount=${requestDetails.quantity}&token=${sessionToken}${requestDetails.difficulty != null ? `&difficulty=${requestDetails.difficulty}` : ""}${requestDetails.type != null ? `&type=${requestDetails.type}` : ""}`);
+    let request = await fetch(`https://opentdb.com/api.php?amount=${requestDetails.quantity}&token=${sessionToken}${requestDetails.difficulty != null ? `&difficulty=${requestDetails.difficulty}` : ""}${requestDetails.type != null ? `&type=${requestDetails.type}` : ""}`);
     if (request.ok) {
         let response = await request.json();
         if (response.response_code == 0) {
@@ -90,8 +92,6 @@ let questionP = document.querySelector("#quiz-question");
 let choicesDiv = document.querySelector("#quiz-choices");
 
 function initializeQuiz() {
-    subjectDifficultySpan.textContent = requestDetails.difficulty.charAt(0).toUpperCase() + requestDetails.difficulty.slice(1);
-    subjectDifficultySpan.className = requestDetails.difficulty;
     quizScoreSpan.textContent = playerDetails.correct;
     quizTotalSpan.textContent = quizDetails.quizList.length;
 
@@ -101,6 +101,8 @@ function initializeQuiz() {
 function displayQuiz(index) {
     quizDetails.currentQuestion = quizDetails.quizList[index]
     subjectSpan.innerHTML = quizDetails.currentQuestion.category.replace("Science: ", "").replace("Entertainment: ", "");
+    subjectDifficultySpan.textContent = quizDetails.currentQuestion.difficulty.charAt(0).toUpperCase() + quizDetails.currentQuestion.difficulty.slice(1);
+    subjectDifficultySpan.className = quizDetails.currentQuestion.difficulty;
     questionP.innerHTML = [quizDetails.currentIndex + 1] + ". " + quizDetails.currentQuestion.question;
     choicesDiv.innerHTML = "";
 
@@ -148,10 +150,12 @@ function showSummary() {
 }
 
 function displaySummary() {
-    summarySubjectDifficultySpan.textContent = requestDetails.difficulty.charAt(0).toUpperCase() + requestDetails.difficulty.slice(1);
-    summarySubjectDifficultySpan.style.color = `var(--difficulty-${requestDetails.difficulty})`
+    if (requestDetails.difficulty != null) {
+        summarySubjectDifficultySpan.textContent = requestDetails.difficulty.charAt(0).toUpperCase() + requestDetails.difficulty.slice(1);
+        summarySubjectDifficultySpan.style.color = `var(--difficulty-${requestDetails.difficulty})`;
+    }
     summaryScoreSpan.textContent = playerDetails.correct;
-    summaryScoreSpan.style.color = playerDetails.correct > (quizDetails.quizList / 2) ? "#58cc02" : "var(--difficulty-hard)";
+    summaryScoreSpan.style.color = playerDetails.correct > (quizDetails.quizList / 2) ? "var(--answer-correct)" : "var(--answer-wrong)";
     summaryTotalQuestionSpan.textContent = requestDetails.quantity;
 
     questionLogs.innerHTML = "";
@@ -208,9 +212,10 @@ function validateResponseQuizDetails() {
 
 function submitPlayerPerformanceFirebase() {
     let username = playernamePromptInput.value;
-    let performance = parseInt(getPlayerPerformance() * 100);
+    let rawPerformance = getPlayerPerformance() * 100;
+    let performance = Number.isInteger(rawPerformance) ? parseInt(rawPerformance) : parseFloat(rawPerformance.toFixed(2));
     let questionsAnswered = playerDetails.totalCorrect + playerDetails.totalWrong
-    let performanceRating = getPlayerPerformance() * questionsAnswered;
+    let performanceRating = getPlayerPerformance() * Math.log(questionsAnswered);
     push(ref(database, "/leaderboards"), {
         username: username,
         rating: performance,
@@ -283,46 +288,43 @@ function resetQuizGame() {
 
 }
 
-async function initializeLeaderboards() {
-    let leaderboards = await get(ref(database, "/leaderboards"));
-    let response = leaderboards.val();
-    let bucketKeys = Object.keys(response);
-    let sorted = [];
+function initializeLeaderboards() {
+    onValue(ref(database, "/leaderboards"), snapshot => {
+        if (!snapshot.exists()) return;
+        let response = snapshot.val();
+        let bucketKeys = Object.keys(response);
+        let sorted = [];
 
-    console.log(response, bucketKeys);
-    for (let i = 0; i < bucketKeys.length; i++) {
-        sorted.push([
-            [bucketKeys[i]], response[bucketKeys[i]].performance_rating
-        ]);
-    }
-
-    sorted.sort(function(a, b) {
-        return b[1] - a[1];
-    })
-
-    let quizWizardDivs = sorted.map((arr, index) => {
-        let bucketKey = arr[0];
-        console.log(bucketKey);
-
-        let ratingP = document.createElement("p");
-        ratingP.textContent = response[bucketKey].rating + "%";
-
-        let nameAndQAP = document.createElement("p");
-        nameAndQAP.innerHTML = response[bucketKey].username + "<br>" + response[bucketKey].questions_answered + " Questions answered.";
-
-        if (index == 0) {
-            ratingP.className = "gold";
-        } else if (index == 1) {
-            ratingP.className = "silver";
-        } else if (index == 2) {
-            ratingP.className = "bronze";
+        console.log(response, bucketKeys);
+        for (let i = 0; i < bucketKeys.length; i++) {
+            sorted.push([
+                [bucketKeys[i]], response[bucketKeys[i]].performance_rating
+            ]);
         }
-        return [ratingP, nameAndQAP];
-    });
 
-    let topWizardDiv = document.querySelector(".top-wizards");
-    topWizardDiv.innerHTML = "";
-    topWizardDiv.append(...quizWizardDivs.flat());
+        sorted.sort(function(a, b) {
+            return b[1] - a[1];
+        })
+
+        let quizWizardDivs = sorted.map((arr, index) => {
+            let bucketKey = arr[0];
+            console.log(bucketKey);
+
+            let ratingP = document.createElement("p");
+            ratingP.textContent = response[bucketKey].rating + "%";
+
+            let nameAndQAP = document.createElement("p");
+            nameAndQAP.innerHTML = response[bucketKey].username + "<br>" + response[bucketKey].questions_answered + " Questions answered.";
+
+            ratingP.className = index != 0 ? index != 1 ? index != 2 ? "" : "bronze" : "silver" : "gold";
+
+            return [ratingP, nameAndQAP];
+        });
+
+        let topWizardDiv = document.querySelector(".top-wizards");
+        topWizardDiv.innerHTML = "";
+        topWizardDiv.append(...quizWizardDivs.flat());
+    });
 }
 
 let quizGameBody = document.querySelector("main");
@@ -415,7 +417,7 @@ quizCountInput.addEventListener("keydown", (event) => {
 
 let startQuizButton = document.querySelector("#start-quiz-button");
 startQuizButton.addEventListener("click", async function() {
-    if (!validateResponseQuizDetails()) return;
+    // if (!validateResponseQuizDetails()) return;
     quizDetails.quizList = await getQuestion();
 
     if (quizDetails.quizList == null) return;
@@ -439,17 +441,17 @@ quizChoicesDiv.addEventListener("click", async function(event) {
             await correctAudio.play();
             playerDetails.correct += 1;
             quizScoreSpan.textContent = playerDetails.correct;
-            button.style.backgroundColor = "#58cc02";
+            button.style.backgroundColor = "var(--answer-correct)";
         } else {
             await wrongAudio.play();
             let choices = document.querySelector("#quiz-choices");
             let correctButton = Array.from(choices.children).filter(button => button.originalText == correctAnswer)[0];
 
             playerDetails.wrong += 1;
-            button.style.backgroundColor = "#ff4b4b";
+            button.style.backgroundColor = "var(--answer-wrong)";
             button.style.scale = .9905;
 
-            correctButton.style.backgroundColor = "#58cc02";
+            correctButton.style.backgroundColor = "var(--answer-correct)";
             correctButton.style.scale = 1.05;
         }
 
@@ -487,10 +489,10 @@ nextQuizButton.addEventListener("click", async function() {
 });
 
 let closeLeaderboardsPromptButton = document.querySelector("#close-leaderboards-prompt");
-closeLeaderboardsPromptButton.addEventListener("click", showLeaderboards);
+closeLeaderboardsPromptButton.addEventListener("click", hidePromptLeaderboards);
 
 let showQuizGameButton = document.querySelector("#quiz-game-button");
-showQuizGameButton.addEventListener("click", showQuizGame)
+showQuizGameButton.addEventListener("click", showQuizGame);
 
 let showLeaderboardsButton = document.querySelector("#leaderboards-button");
 showLeaderboardsButton.addEventListener("click", showLeaderboards);
@@ -514,6 +516,5 @@ let wrongAudio = new Audio(location.protocol + '//' + location.host + location.p
 let congratsAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/congratulations.mp3");
 (async() => {
     await initializeGame();
-
-    await initializeLeaderboards();
+    initializeLeaderboards();
 })();
