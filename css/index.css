@@ -28,6 +28,24 @@
     background-color: var(--primary-backgroundcolor);
 }
 
+.gold {
+    background-image: linear-gradient( to right, #e6a100 0, #ffc800 25%, #ffe700 50%, #ffc800 75%, #e6a100 100%);
+    color: transparent !important;
+    -webkit-background-clip: text;
+}
+
+.silver {
+    background-image: linear-gradient( to right, #aac1d4 0, #d6e4ef 25%, #d1dce5 50%, #d6e4ef 75%, #aac1d4 100%);
+    color: transparent !important;
+    -webkit-background-clip: text;
+}
+
+.bronze {
+    background-image: linear-gradient( to right, #483237 0, #e5ae7c 25%, #d6aa82 50%, #e5ae7c 75%, #483237 100%);
+    color: transparent !important;
+    -webkit-background-clip: text;
+}
+
 .button-control {
     padding: .3rem 1rem;
     background-color: var(--tertiary-color);
@@ -142,7 +160,7 @@ header {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
 }
 
 .nav-buttons>button {
@@ -280,9 +298,8 @@ main {
 
 .quiz-body .choices {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(10rem, 1fr));
     margin: 0 auto;
-    width: max-content;
     gap: .5rem;
 }
 
@@ -294,6 +311,8 @@ main {
     color: var(--primary-backgroundcolor);
     background-color: var(--secondary-color);
     cursor: pointer;
+    transition-timing-function: ease-out;
+    transition: scale 0.2s;
 }
 
 .quiz-body .choices button:hover {
@@ -356,9 +375,130 @@ main {
 }
 
 .quiz-summary .next-button-div {
-    flex: 0 a fit-content;
+    flex: 0 1 fit-content;
     text-align: center;
 }
+
+
+/* LEADERBOARDS-PROMPT */
+
+.leaderboards-prompt {
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    padding: 1rem;
+    border-radius: var(--big-roundness);
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px 0px, rgba(17, 17, 26, 0.05) 0px 8px 32px 0px;
+    max-width: 30rem;
+}
+
+.leaderboards-prompt .leaderboards-heading {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.leaderboards-heading button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.leaderboards-heading button:hover>i {
+    color: var(--secondary-color);
+}
+
+.leaderboards-prompt-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.leaderboards-prompt-body p:first-child {
+    font-size: var(--big-text-size);
+    font-weight: bolder;
+    text-align: center;
+    color: #58cc02;
+}
+
+.leaderboards-prompt-body p:nth-child(2) {
+    font-size: calc(var(--text-size) + .2rem);
+    font-weight: bolder;
+    text-align: center;
+}
+
+.leaderboards-prompt-body input {
+    border: 2px solid #58cc02;
+}
+
+
+/* LEADERBOARDS */
+
+.leaderboards {
+    flex: 1 1 auto;
+    display: none;
+    gap: 1rem;
+    flex-direction: column;
+    align-items: center;
+    min-height: 50%;
+}
+
+.leaderboards .trophy-logo {
+    font-size: 5rem;
+    margin-top: 1rem;
+    flex: 0 1 auto;
+}
+
+.leaderboards .top-wizards {
+    padding-right: 1rem;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 1rem;
+    row-gap: 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.leaderboards .top-wizards p {
+    font-weight: bolder;
+    text-align: center;
+}
+
+.leaderboards .top-wizards p:nth-child(2n+1) {
+    font-size: var(--big-text-size);
+    color: #58cc02;
+}
+
+
+/* .leaderboards .top-wizards {
+    height: 100;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.leaderboards .top-wizards .quiz-wizards {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    column-gap: 1rem;
+}
+
+.leaderboards .top-wizards .quiz-wizards p {
+    font-weight: bolder;
+}
+
+.leaderboards .top-wizards .quiz-wizards p:first-child {
+    grid-row: 1/3;
+    font-size: var(--big-text-size);
+    line-height: var(--big-text-size);
+    color: #58cc02;
+} */
 
 
 /* CONTACTS */

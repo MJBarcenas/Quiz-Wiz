@@ -1,3 +1,13 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseSettings = {
+    databaseURL: "https://quiz-wiz-1c3b8-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+
+const app = initializeApp(firebaseSettings);
+const database = getDatabase(app);
+
 let sessionToken;
 let playerDetails = {
     totalCorrect: 0,
@@ -13,16 +23,13 @@ let quizDetails = {
     quizDone: false
 }
 let requestDetails = {
-    categoryID: null,
-    category: null,
     difficulty: null,
     type: null,
     quantity: 10
 };
 
+localStorage.removeItem("session_token");
 async function initializeGame() {
-    let subjectOptions = document.querySelector("#subject-options");
-    let topics = await getTopicList();
     if (localStorage.getItem("session_token") == null) {
         sessionToken = await getSessionToken();
 
@@ -35,23 +42,6 @@ async function initializeGame() {
     } else {
         sessionToken = localStorage.getItem("session_token");
     }
-    subjectOptions.append(...topics);
-}
-
-async function getTopicList() {
-    let topics = await fetch("https://opentdb.com/api_category.php");
-    let response = await topics.json();
-    // console.log(response);
-    let topicLists = response.trivia_categories.map(topic => {
-        let liElement = document.createElement("span");
-        let topicName = topic.name.replace("Entertainment: ", "").replace("Science: ", "");
-        liElement.textContent = topicName;
-        liElement.setAttribute("topic-id", topic.id);
-        liElement.setAttribute("topic-name", topicName);
-
-        return liElement;
-    });
-    return topicLists;
 }
 
 async function getSessionToken() {
@@ -65,12 +55,13 @@ async function getSessionToken() {
 }
 
 async function getQuestion() {
-    let request = await fetch(`https://opentdb.com/api.php?category=${requestDetails.categoryID}&difficulty=${requestDetails.difficulty}&type=${requestDetails.type}&amount=${requestDetails.quantity}&token=${sessionToken}`);
+    let request = await fetch(`https://opentdb.com/api.php?difficulty=${requestDetails.difficulty}&type=${requestDetails.type}&amount=${requestDetails.quantity}&token=${sessionToken}`);
     if (request.ok) {
-        response = await request.json();
+        let response = await request.json();
         if (response.response_code == 0) {
-            console.log(0);
-            console.log(sessionToken, response);
+            for (let i = 0; i < response.results.length; i++) {
+                console.log(response.results[i].correct_answer);
+            }
             return response.results;
         } else if (response.response_code == 1) {
             console.log(1);
@@ -99,7 +90,6 @@ let questionP = document.querySelector("#quiz-question");
 let choicesDiv = document.querySelector("#quiz-choices");
 
 function initializeQuiz() {
-    subjectSpan.textContent = requestDetails.category;
     subjectDifficultySpan.textContent = requestDetails.difficulty.charAt(0).toUpperCase() + requestDetails.difficulty.slice(1);
     subjectDifficultySpan.className = requestDetails.difficulty;
     quizScoreSpan.textContent = playerDetails.correct;
@@ -110,6 +100,7 @@ function initializeQuiz() {
 
 function displayQuiz(index) {
     quizDetails.currentQuestion = quizDetails.quizList[index]
+    subjectSpan.innerHTML = quizDetails.currentQuestion.category.replace("Science: ", "").replace("Entertainment: ", "");
     questionP.innerHTML = [quizDetails.currentIndex + 1] + ". " + quizDetails.currentQuestion.question;
     choicesDiv.innerHTML = "";
 
@@ -140,7 +131,6 @@ let questionLogs = document.querySelector("#question-logs");
 let quizSummary = document.querySelector("#quiz-summary");
 let quizBody = document.querySelector("#quiz-body");
 let quizHome = document.querySelector(".quiz-home");
-let summarySubjectSpan = document.querySelector("#summary-subject");
 let summarySubjectDifficultySpan = document.querySelector("#summary-subject-difficulty");
 let summaryScoreSpan = document.querySelector("#summary-score");
 let summaryTotalQuestionSpan = document.querySelector("#summary-total-question");
@@ -158,11 +148,10 @@ function showSummary() {
 }
 
 function displaySummary() {
-    summarySubjectSpan.textContent = requestDetails.category;
     summarySubjectDifficultySpan.textContent = requestDetails.difficulty.charAt(0).toUpperCase() + requestDetails.difficulty.slice(1);
     summarySubjectDifficultySpan.style.color = `var(--difficulty-${requestDetails.difficulty})`
     summaryScoreSpan.textContent = playerDetails.correct;
-    summaryScoreSpan.style.color = playerDetails.correct > 5 ? "#58cc02" : "var(--difficulty-hard)";
+    summaryScoreSpan.style.color = playerDetails.correct > (quizDetails.quizList / 2) ? "#58cc02" : "var(--difficulty-hard)";
     summaryTotalQuestionSpan.textContent = requestDetails.quantity;
 
     questionLogs.innerHTML = "";
@@ -194,19 +183,11 @@ function displaySummary() {
     showSummary();
 }
 
-let subjectButton = document.querySelector("#subject-button");
 let difficultyButton = document.querySelector("#difficulty-button");
 let typeButton = document.querySelector("#type-button");
 
 function validateResponseQuizDetails() {
-    if (requestDetails.categoryID == null) {
-        subjectButton.style.outline = "2px solid red";
-        subjectButton.focus();
-        setTimeout(() => {
-            subjectButton.style.outline = "none";
-        }, 2000);
-        return false;
-    } else if (requestDetails.difficulty == null) {
+    if (requestDetails.difficulty == null) {
         difficultyButton.style.outline = "2px solid red";
         difficultyButton.focus();
         setTimeout(() => {
@@ -225,6 +206,68 @@ function validateResponseQuizDetails() {
     return true;
 }
 
+function submitPlayerPerformanceFirebase() {
+    let username = playernamePromptInput.value;
+    let performance = parseInt(getPlayerPerformance() * 100);
+    let questionsAnswered = playerDetails.totalCorrect + playerDetails.totalWrong
+    let performanceRating = getPlayerPerformance() * questionsAnswered;
+    push(ref(database, "/leaderboards"), {
+        username: username,
+        rating: performance,
+        performance_rating: performanceRating,
+        questions_answered: questionsAnswered
+    });
+}
+
+function getPlayerPerformance() {
+    let totalQuestionAnswered = playerDetails.totalCorrect + playerDetails.totalWrong;
+    let performance = playerDetails.totalCorrect / totalQuestionAnswered;
+    return performance;
+}
+
+let performanceRatingP = document.querySelector("#performance-rating");
+let playernamePromptInput = document.querySelector("#player-name-prompt");
+
+playernamePromptInput.addEventListener("keydown", function(event) {
+    if (event.key == "Enter") {
+        if (playernamePromptInput.value.trim().length == 0) {
+            playernamePromptInput.focus();
+            playernamePromptInput.style.borderColor = "#ff4b4b";
+            setTimeout(() => {
+                playernamePromptInput.style.borderColor = "#58cc02";
+            }, 2000);
+            return;
+        }
+        submitPlayerPerformanceFirebase();
+        hidePromptLeaderboards();
+    }
+});
+
+async function promptLeaderBoards() {
+    let playerPerformance = parseInt(getPlayerPerformance() * 100);
+    console.log(playerPerformance);
+    if (playerPerformance >= 80) {
+        correctAudio.pause()
+        correctAudio.currentTime = 0;
+        wrongAudio.pause()
+        wrongAudio.currentTime = 0;
+        await congratsAudio.play()
+        performanceRatingP.textContent = playerPerformance + "%";
+        playernamePromptInput.value = "";
+        showPromptLeaderboards();
+    }
+}
+
+let leaderboardPrompt = document.querySelector(".leaderboards-prompt");
+
+function showPromptLeaderboards() {
+    leaderboardPrompt.style.display = "block";
+}
+
+function hidePromptLeaderboards() {
+    leaderboardPrompt.style.display = "none ";
+}
+
 function resetQuizGame() {
     quizDetails.quizDone = true;
     playerDetails.totalCorrect += playerDetails.correct;
@@ -238,6 +281,61 @@ function resetQuizGame() {
     quizDetails.currentIndex = 0;
     quizDetails.quizDone = false
 
+}
+
+async function initializeLeaderboards() {
+    let leaderboards = await get(ref(database, "/leaderboards"));
+    let response = leaderboards.val();
+    let bucketKeys = Object.keys(response);
+    let sorted = [];
+
+    console.log(response, bucketKeys);
+    for (let i = 0; i < bucketKeys.length; i++) {
+        sorted.push([
+            [bucketKeys[i]], response[bucketKeys[i]].performance_rating
+        ]);
+    }
+
+    sorted.sort(function(a, b) {
+        return b[1] - a[1];
+    })
+
+    let quizWizardDivs = sorted.map((arr, index) => {
+        let bucketKey = arr[0];
+        console.log(bucketKey);
+
+        let ratingP = document.createElement("p");
+        ratingP.textContent = response[bucketKey].rating + "%";
+
+        let nameAndQAP = document.createElement("p");
+        nameAndQAP.innerHTML = response[bucketKey].username + "<br>" + response[bucketKey].questions_answered + " Questions answered.";
+
+        if (index == 0) {
+            ratingP.className = "gold";
+        } else if (index == 1) {
+            ratingP.className = "silver";
+        } else if (index == 2) {
+            ratingP.className = "bronze";
+        }
+        return [ratingP, nameAndQAP];
+    });
+
+    let topWizardDiv = document.querySelector(".top-wizards");
+    topWizardDiv.innerHTML = "";
+    topWizardDiv.append(...quizWizardDivs.flat());
+}
+
+let quizGameBody = document.querySelector("main");
+let leaderboardsBody = document.querySelector(".leaderboards");
+
+function showLeaderboards() {
+    quizGameBody.style.display = "none";
+    leaderboardsBody.style.display = "flex";
+}
+
+function showQuizGame() {
+    leaderboardsBody.style.display = "none";
+    quizGameBody.style.display = "flex";
 }
 
 function shuffle(array) {
@@ -274,18 +372,7 @@ dropDowns.forEach(button => {
     });
     let dropDownContent = button.nextElementSibling;
     let dropButton = button.closest("button");
-    if (dropDownContent.id == "subject-options") {
-        dropDownContent.addEventListener("click", function(clicked) {
-            let topic = clicked.target.getAttribute("topic-name");
-            let topicID = clicked.target.getAttribute("topic-id");
-
-            requestDetails.category = topic;
-            requestDetails.categoryID = topicID;
-            dropButton.innerHTML = topic + ' <i class="fa-solid fa-chevron-down"></i>'
-
-            console.log(requestDetails);
-        });
-    } else if (dropDownContent.id == "difficulty-options") {
+    if (dropDownContent.id == "difficulty-options") {
         dropDownContent.addEventListener("click", function(clicked) {
             let difficulty = clicked.target.getAttribute("topic-difficulty");
             let textContent = clicked.target.textContent;
@@ -340,6 +427,10 @@ startQuizButton.addEventListener("click", async function() {
 let quizChoicesDiv = document.querySelector("#quiz-choices");
 quizChoicesDiv.addEventListener("click", async function(event) {
     if (event.target.tagName.toLowerCase() == "button") {
+        Array.from(quizChoicesDiv.children).forEach(element => {
+            element.disabled = true;
+        });
+
         let button = event.target;
         let userAnswer = button.originalText;
         let correctAnswer = quizDetails.currentQuestion.correct_answer;
@@ -356,6 +447,7 @@ quizChoicesDiv.addEventListener("click", async function(event) {
 
             playerDetails.wrong += 1;
             button.style.backgroundColor = "#ff4b4b";
+            button.style.scale = .9905;
 
             correctButton.style.backgroundColor = "#58cc02";
             correctButton.style.scale = 1.05;
@@ -363,13 +455,10 @@ quizChoicesDiv.addEventListener("click", async function(event) {
 
         playerDetails.choicedAnswers.push(userAnswer);
 
-        setTimeout(() => {
-            displayQuiz(quizDetails.currentIndex);
-        }, 2000);
-
         if (quizDetails.quizDone) {
             displaySummary();
             resetQuizGame();
+            await promptLeaderBoards();
             return;
         }
 
@@ -377,9 +466,13 @@ quizChoicesDiv.addEventListener("click", async function(event) {
             quizDetails.currentIndex += 1;
         }
 
-        if (quizDetails.currentIndex == 9) {
+        if (quizDetails.currentIndex == quizDetails.quizList.length - 1) {
             quizDetails.quizDone = true;
         }
+
+        setTimeout(() => {
+            displayQuiz(quizDetails.currentIndex);
+        }, 2000);
     }
 });
 
@@ -392,6 +485,15 @@ nextQuizButton.addEventListener("click", async function() {
     initializeQuiz();
     displayQuiz(quizDetails.currentIndex);
 });
+
+let closeLeaderboardsPromptButton = document.querySelector("#close-leaderboards-prompt");
+closeLeaderboardsPromptButton.addEventListener("click", showLeaderboards);
+
+let showQuizGameButton = document.querySelector("#quiz-game-button");
+showQuizGameButton.addEventListener("click", showQuizGame)
+
+let showLeaderboardsButton = document.querySelector("#leaderboards-button");
+showLeaderboardsButton.addEventListener("click", showLeaderboards);
 
 
 window.addEventListener("click", function(event) {
@@ -409,6 +511,9 @@ window.addEventListener("click", function(event) {
 
 let correctAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/correct_answer.mp3");
 let wrongAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/incorrect_answer.mp3");
+let congratsAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/congratulations.mp3");
 (async() => {
     await initializeGame();
+
+    await initializeLeaderboards();
 })();

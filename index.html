@@ -17,17 +17,13 @@
                 <p>Quiz <span>Wiz</span></p>
             </div>
             <div class="nav-buttons">
-                <button><i class="fa-solid fa-moon"></i></button>
-                <button><i class="fa-solid fa-trophy"></i></button>
+                <button id="toggle-theme-button"><i class="fa-solid fa-moon"></i></button>
+                <button id="quiz-game-button"><i class="fa-solid fa-a"></i></button>
+                <button id="leaderboards-button"><i class="fa-solid fa-trophy"></i></button>
             </div>
         </header>
         <main>
             <div class="quiz-settings">
-                <div class="subject-options">
-                    <button class="dropdown-button" id="subject-button">Subject <i class="fa-solid fa-chevron-down"></i></button>
-                    <div id="subject-options">
-                    </div>
-                </div>
                 <div class="difficulty-options">
                     <button class="dropdown-button" id="difficulty-button">Difficulty <i class="fa-solid fa-chevron-down"></i></button>
                     <div id="difficulty-options">
@@ -52,7 +48,7 @@
             <div class="quiz-body" id="quiz-body" style="display: none;">
                 <div class="quiz-heading">
                     <div class="subject-title">
-                        <p><span id="subject">Science</span> - <span class="hard" id="subject-difficulty">Hard</span></p>
+                        <p><span id="subject"></span> - <span class="hard" id="subject-difficulty">Hard</span></p>
                     </div>
                     <div class="score">
                         <p><span id="quiz-score">10</span> / <span id="quiz-total">10</span></p>
@@ -70,87 +66,36 @@
             </div>
             <div class="quiz-summary" id="quiz-summary">
                 <div class="summary-heading">
-                    <div class="summary-title">Summary: <span id="summary-subject"></span>[<span id="summary-subject-difficulty"></span>]</div>
+                    <div class="summary-title">Difficulty: <span id="summary-subject-difficulty"></span></div>
                     <div class="summary-score"><span id="summary-score"></span> / <span id="summary-total-question"></span></div>
                 </div>
                 <div class="summary-body">
                     <div class="question-logs" id="question-logs">
-                        <div class="question-log">
-                            <p>1. What is the biggest star in the universe?</p>
-                            <p>Your Answer: <span class="wrong">Sun</span></p>
-                            <p>Correct Answer: <span class="correct">Sun</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
-                        <div class="question-log">
-                            <p><span>1. What is the biggest star in the universe? </span></p>
-                            <p>Answer: <span>Sun</span> | <span>UY Scuti</span></p>
-                        </div>
                     </div>
                 </div>
                 <div class="next-button-div">
                     <button id="quiz-next-button" class="button-control">Next</button>
                 </div>
             </div>
+            <div class="leaderboards-prompt">
+                <div class="leaderboards-heading">
+                    <button id="close-leaderboards-prompt"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="leaderboards-prompt-body">
+                    <p id="performance-rating"></p>
+                    <p>Wow! What a performance! Would you like to have your name on the leaderboards?</p>
+                    <input type="text" id="player-name-prompt" class="textbox-control" placeholder="example: Giga Chad" spellcheck="false">
+                </div>
+            </div>
         </main>
+        <div class="leaderboards">
+            <div class="trophy-logo">
+                🗿🏆🗿
+            </div>
+            <div class="top-wizards">
+
+            </div>
+        </div>
         <div class="contacts">
             <a href="https://www.facebook.com/Imaqtchael" target="_blank">
                 <div class="links">
@@ -177,7 +122,7 @@
         <footer>
             <p>Project by: Michael Justin Barcenas</p>
         </footer>
-        <script src="js/index.js"></script>
+        <script src="js/index.js" type="module"></script>
     </div>
 </body>
 
