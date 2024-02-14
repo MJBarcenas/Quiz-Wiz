@@ -128,6 +128,7 @@ function displayQuiz(index) {
 
         choicesDiv.append(...choicesButtons);
     }
+    startLoading();
 }
 
 let questionLogs = document.querySelector("#question-logs");
@@ -211,18 +212,28 @@ function validateResponseQuizDetails() {
     return true;
 }
 
+let playerSubmitted = false;
 function submitPlayerPerformanceFirebase() {
     let username = playernamePromptInput.value;
     let rawPerformance = getPlayerPerformance() * 100;
     let performance = Number.isInteger(rawPerformance) ? parseInt(rawPerformance) : parseFloat(rawPerformance.toFixed(2));
     let questionsAnswered = playerDetails.totalCorrect + playerDetails.totalWrong
     let performanceRating = getPlayerPerformance() * Math.log(questionsAnswered);
-    push(ref(database, "/leaderboards"), {
-        username: username,
-        rating: performance,
-        performance_rating: performanceRating,
-        questions_answered: questionsAnswered
-    });
+    if (!playerSubmitted) {
+        sessionUser = push(ref(database, "/leaderboards"), {
+            username: username,
+            rating: performance,
+            performance_rating: performanceRating,
+            questions_answered: questionsAnswered,
+        }).key;
+        playerSubmitted = true;
+    } else {
+        update(ref(database, "/leaderboards/" + sessionUser), {
+            rating: performance,
+            performance_rating: performanceRating,
+            questions_answered: questionsAnswered,
+        });
+    }
 }
 
 function getPlayerPerformance() {
@@ -252,15 +263,17 @@ playernamePromptInput.addEventListener("keydown", function(event) {
 async function promptLeaderBoards() {
     let playerPerformance = parseInt(getPlayerPerformance() * 100);
     console.log(playerPerformance);
-    if (playerPerformance >= 80) {
-        correctAudio.pause()
-        correctAudio.currentTime = 0;
-        wrongAudio.pause()
-        wrongAudio.currentTime = 0;
-        await congratsAudio.play()
+    correctAudio.pause()
+    correctAudio.currentTime = 0;
+    wrongAudio.pause()
+    wrongAudio.currentTime = 0;
+    await congratsAudio.play()
+    if (playerPerformance >= 80 && !playerSubmitted) {
         performanceRatingP.textContent = playerPerformance + "%";
         playernamePromptInput.value = "";
         showPromptLeaderboards();
+    } else if (playerSubmitted) {
+        submitPlayerPerformanceFirebase();
     }
 }
 
@@ -422,6 +435,65 @@ function setWebIcon() {
     iconLink.href = lowerIcon;
 }
 
+let quizTimer = 0;
+let quizTimerCounter ;
+let styleSheet = document.styleSheets[0];
+let loader = Array.from(styleSheet.cssRules).filter(selecter => selecter.selectorText == ".loader::after")[0];
+
+function startLoading() {
+    loader.style.animation = "20s linear 0s 1 normal none running animFw";
+    quizTimerCounter = setInterval(async () => {
+        quizTimer += 1;
+        if (quizTimer == 20) {
+            stopLoading();
+            await quizTimedOut();
+        }
+    }, 1000);
+}
+
+function stopLoading() {
+    quizTimer = 0;
+    clearInterval(quizTimerCounter);
+}
+
+async function quizTimedOut() {
+    let correctAnswer = quizDetails.currentQuestion.correct_answer;
+
+
+    await wrongAudio.play();
+    let choices = document.querySelector("#quiz-choices");
+    let correctButton = Array.from(choices.children).filter(button => button.originalText == correctAnswer)[0];
+
+    playerDetails.wrong += 1;
+
+    correctButton.style.backgroundColor = "var(--answer-correct)";
+    correctButton.style.scale = 1.05;
+        
+
+    playerDetails.choicedAnswers.push("None");
+
+    if (quizDetails.quizDone) {
+        blurQuiz();
+        displaySummary();
+        resetQuizGame();
+        await promptLeaderBoards();
+        return;
+    }
+
+    if (!quizDetails.quizDone) {
+        quizDetails.currentIndex += 1;
+    }
+
+    if (quizDetails.currentIndex == quizDetails.quizList.length - 1) {
+        quizDetails.quizDone = true;
+    }
+
+    loader.style.animation = "";
+    setTimeout(() => {
+        displayQuiz(quizDetails.currentIndex);
+    }, 2000);
+}
+
 function shuffle(array) {
     let currentIndex = array.length,
         randomIndex;
@@ -538,6 +610,8 @@ quizChoicesDiv.addEventListener("click", async function(event) {
         }
 
         playerDetails.choicedAnswers.push(userAnswer);
+        stopLoading();
+        loader.style.animation = "";
 
         if (quizDetails.quizDone) {
             blurQuiz();

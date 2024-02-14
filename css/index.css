@@ -303,7 +303,7 @@ main {
     padding: 1rem;
     margin-bottom: auto;
     height: 50%;
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: space-between;
 }
@@ -337,7 +337,7 @@ main {
 }
 
 .quiz-body .choices button {
-    padding: .3rem .5rem;
+    padding: .3rem 1.5rem;
     border-radius: var(--xs-roundness);
     border: none;
     outline: none;
@@ -354,6 +354,41 @@ main {
 
 .quiz-body .choices button:active {
     scale: 1.05;
+}
+
+
+/* QUIZ-LOADER */
+
+.loader {
+    width: 100%;
+    height: 4.8px;
+    display: inline-block;
+    position: relative;
+    background: var(--primary-backgroundcolor);
+    overflow: hidden;
+}
+
+.loader::after {
+    content: '';
+    box-sizing: border-box;
+    width: 0;
+    height: 4.8px;
+    background: var(--answer-correct);
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* animation: animFw 10s linear; */
+}
+
+@keyframes animFw {
+    0% {
+        width: 0;
+        background: var(--answer-correct);
+    }
+    100% {
+        width: 100%;
+        background: var(--answer-wrong);
+    }
 }
 
 
