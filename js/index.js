@@ -28,7 +28,6 @@ let requestDetails = {
     quantity: 10
 };
 
-localStorage.removeItem("session_token");
 async function initializeGame() {
     if (localStorage.getItem("session_token") == null) {
         sessionToken = await getSessionToken();
@@ -48,7 +47,6 @@ async function getSessionToken() {
     let request = await fetch("https://opentdb.com/api_token.php?command=request");
     if (request.ok) {
         let response = await request.json();
-        console.log(response);
         return response.token;
     }
     return null;
@@ -56,28 +54,20 @@ async function getSessionToken() {
 
 async function getQuestion() {
     // let request = await fetch(`https://opentdb.com/api.php?difficulty=${requestDetails.difficulty}&type=${requestDetails.type}&amount=${requestDetails.quantity}&token=${sessionToken}`);
-    console.log(`https://opentdb.com/api.php?amount=${requestDetails.quantity}&token=${sessionToken}${requestDetails.difficulty != null ? `&difficulty=${requestDetails.difficulty}` : ""}${requestDetails.type != null ? `&type=${requestDetails.type}` : ""}`);
     let request = await fetch(`https://opentdb.com/api.php?amount=${requestDetails.quantity}&token=${sessionToken}${requestDetails.difficulty != null ? `&difficulty=${requestDetails.difficulty}` : ""}${requestDetails.type != null ? `&type=${requestDetails.type}` : ""}`);
     if (request.ok) {
         let response = await request.json();
         if (response.response_code == 0) {
-            for (let i = 0; i < response.results.length; i++) {
-                console.log(response.results[i].correct_answer);
-            }
             return response.results;
         } else if (response.response_code == 1) {
-            console.log(1);
             alert("Database do not have enough question for your request...");
-        } else if (response.response_code == 2 || response.response_code == 3) {
-            console.log(6);
-            alert("Something went wrong, please try again...");
-        } else if (response.response_code == 4) {
-            console.log(4);
+        } else if (response.response_code == 2) {
+            alert(sessionToken + "Something went wrong, please try again...");
+        } else if (response.response_code == 4 || response.response_code == 3) {
             sessionToken = await getSessionToken();
             localStorage.setItem("session_token", sessionToken);
             return await getQuestion();
         } else if (response.response_code == 5) {
-            console.log(5);
             alert("You are requesting too fast. Please try again in few minutes.");
         }
     }
@@ -92,6 +82,7 @@ let questionP = document.querySelector("#quiz-question");
 let choicesDiv = document.querySelector("#quiz-choices");
 
 function initializeQuiz() {
+    startQuizButton.disabled = true;
     quizScoreSpan.textContent = playerDetails.correct;
     quizTotalSpan.textContent = quizDetails.quizList.length;
 
@@ -151,19 +142,23 @@ function showSummary() {
     quizSummary.style.display = "flex";
 }
 
-function displaySummary() {
+async function displaySummary() {
     if (requestDetails.difficulty != null) {
         summarySubjectDifficultySpan.textContent = requestDetails.difficulty.charAt(0).toUpperCase() + requestDetails.difficulty.slice(1);
         summarySubjectDifficultySpan.style.color = `var(--difficulty-${requestDetails.difficulty})`;
     }
+    correctAudio.pause()
+    correctAudio.currentTime = 0;
+    wrongAudio.pause()
+    wrongAudio.currentTime = 0;
+    let isPassed = playerDetails.correct > (quizDetails.quizList.length / 2);
+    isPassed ? await congratsAudio.play() : await sadAudio.play();
+
     summaryScoreSpan.textContent = playerDetails.correct;
-    summaryScoreSpan.style.color = playerDetails.correct > (quizDetails.quizList / 2) ? "var(--answer-correct)" : "var(--answer-wrong)";
+    summaryScoreSpan.style.color = isPassed ? "var(--answer-correct)" : "var(--answer-wrong)";
     summaryTotalQuestionSpan.textContent = requestDetails.quantity;
 
     questionLogs.innerHTML = "";
-
-    console.log(playerDetails.choicedAnswers);
-    console.log(quizDetails);
 
     let questionLogDivs = quizDetails.quizList.map((question, index) => {
         let questionLogDiv = document.createElement("div");
@@ -262,12 +257,6 @@ playernamePromptInput.addEventListener("keydown", function(event) {
 
 async function promptLeaderBoards() {
     let playerPerformance = parseInt(getPlayerPerformance() * 100);
-    console.log(playerPerformance);
-    correctAudio.pause()
-    correctAudio.currentTime = 0;
-    wrongAudio.pause()
-    wrongAudio.currentTime = 0;
-    await congratsAudio.play()
     if (playerPerformance >= 80 && !playerSubmitted) {
         performanceRatingP.textContent = playerPerformance + "%";
         playernamePromptInput.value = "";
@@ -300,6 +289,7 @@ function resetQuizGame() {
     quizDetails.currentIndex = 0;
     quizDetails.quizDone = false
 
+    startQuizButton.disabled = false;
 }
 
 function initializeLeaderboards() {
@@ -309,7 +299,6 @@ function initializeLeaderboards() {
         let bucketKeys = Object.keys(response);
         let sorted = [];
 
-        console.log(response, bucketKeys);
         for (let i = 0; i < bucketKeys.length; i++) {
             sorted.push([
                 [bucketKeys[i]], response[bucketKeys[i]].performance_rating
@@ -322,7 +311,6 @@ function initializeLeaderboards() {
 
         let quizWizardDivs = sorted.map((arr, index) => {
             let bucketKey = arr[0];
-            console.log(bucketKey);
 
             let ratingP = document.createElement("p");
             ratingP.textContent = response[bucketKey].rating + "%";
@@ -347,11 +335,17 @@ let leaderboardsBody = document.querySelector(".leaderboards");
 function showLeaderboards() {
     quizGameBody.style.display = "none";
     leaderboardsBody.style.display = "flex";
+
+    showQuizGameButton.classList.remove("active");
+    showLeaderboardsButton.classList.add("active");
 }
 
 function showQuizGame() {
     leaderboardsBody.style.display = "none";
     quizGameBody.style.display = "flex";
+
+    showLeaderboardsButton.classList.remove("active");
+    showQuizGameButton.classList.add("active");
 }
 
 let isDarkMode = false;
@@ -457,9 +451,11 @@ function stopLoading() {
 }
 
 async function quizTimedOut() {
+    Array.from(quizChoicesDiv.children).forEach(element => {
+        element.disabled = true;
+    });
+
     let correctAnswer = quizDetails.currentQuestion.correct_answer;
-
-
     await wrongAudio.play();
     let choices = document.querySelector("#quiz-choices");
     let correctButton = Array.from(choices.children).filter(button => button.originalText == correctAnswer)[0];
@@ -468,13 +464,12 @@ async function quizTimedOut() {
 
     correctButton.style.backgroundColor = "var(--answer-correct)";
     correctButton.style.scale = 1.05;
-        
 
     playerDetails.choicedAnswers.push("None");
 
     if (quizDetails.quizDone) {
         blurQuiz();
-        displaySummary();
+        await displaySummary();
         resetQuizGame();
         await promptLeaderBoards();
         return;
@@ -534,9 +529,7 @@ dropDowns.forEach(button => {
             let textContent = clicked.target.textContent;
 
             requestDetails.difficulty = difficulty;
-            dropButton.innerHTML = textContent + ' <i class="fa-solid fa-chevron-down"></i>'
-
-            console.log(requestDetails);
+            dropButton.innerHTML = textContent + ' <i class="fa-solid fa-chevron-down"></i>';
         });
     } else if (dropDownContent.id == "type-options") {
         dropDownContent.addEventListener("click", function(clicked) {
@@ -544,9 +537,7 @@ dropDowns.forEach(button => {
             let textContent = clicked.target.textContent;
 
             requestDetails.type = type;
-            dropButton.innerHTML = textContent + ' <i class="fa-solid fa-chevron-down"></i>'
-
-            console.log(requestDetails);
+            dropButton.innerHTML = textContent + ' <i class="fa-solid fa-chevron-down"></i>';
         });
     }
 });
@@ -586,36 +577,37 @@ quizChoicesDiv.addEventListener("click", async function(event) {
         Array.from(quizChoicesDiv.children).forEach(element => {
             element.disabled = true;
         });
-
+        
         let button = event.target;
         let userAnswer = button.originalText;
         let correctAnswer = quizDetails.currentQuestion.correct_answer;
-
+        
         if (userAnswer == correctAnswer) {
             await correctAudio.play();
             playerDetails.correct += 1;
             quizScoreSpan.textContent = playerDetails.correct;
             button.style.backgroundColor = "var(--answer-correct)";
+            button.style.scale = button.clientWidth > 220 ? 1.015 : 1.05;
         } else {
             await wrongAudio.play();
             let choices = document.querySelector("#quiz-choices");
             let correctButton = Array.from(choices.children).filter(button => button.originalText == correctAnswer)[0];
-
+            
             playerDetails.wrong += 1;
             button.style.backgroundColor = "var(--answer-wrong)";
             button.style.scale = .9905;
-
+            
             correctButton.style.backgroundColor = "var(--answer-correct)";
-            correctButton.style.scale = 1.05;
+            correctButton.style.scale = button.clientWidth > 220 ? 1.015 : 1.05;
         }
-
+        
         playerDetails.choicedAnswers.push(userAnswer);
         stopLoading();
         loader.style.animation = "";
 
         if (quizDetails.quizDone) {
             blurQuiz();
-            displaySummary();
+            await displaySummary();
             resetQuizGame();
             await promptLeaderBoards();
             return;
@@ -668,9 +660,12 @@ window.addEventListener("click", function(event) {
     }
 });
 
+
+localStorage.removeItem("user_id");
 let correctAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/correct_answer.mp3");
 let wrongAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/incorrect_answer.mp3");
 let congratsAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/congratulations.mp3");
+let sadAudio = new Audio(location.protocol + '//' + location.host + location.pathname + "/assets/sounds/sad_celebration.mp3");
 (async() => {
     await initializeGame();
     initializeLeaderboards();
