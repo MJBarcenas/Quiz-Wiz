@@ -340,6 +340,64 @@ function showQuizGame() {
     quizGameBody.style.display = "flex";
 }
 
+let isDarkMode = false;
+let primaryBackgroundColor = "#f3faf5";
+let primaryColor = "#023047";
+let secondaryColor = "#219ebc";
+let tertiaryColor = "#ffb703";
+let textColor = "#3c3c3c";
+let boxShadow = "rgba(17, 17, 26, 0.1) 0px 4px 16px 0px, rgba(17, 17, 26, 0.05) 0px 8px 32px 0px";
+let toggleThemeButton = document.querySelector("#toggle-theme-button");
+toggleThemeButton.addEventListener("click", toggleTheme);
+
+function toggleLightMode() {
+    primaryBackgroundColor = "#f3faf5";
+    primaryColor = "#023047";
+    secondaryColor = "#219ebc";
+    tertiaryColor = "#ffb703";
+    textColor = "#3c3c3c";
+    boxShadow = "rgba(17, 17, 26, 0.1) 0px 4px 16px 0px, rgba(17, 17, 26, 0.05) 0px 8px 32px 0px";
+
+    document.documentElement.style.setProperty("--primary-backgroundcolor", primaryBackgroundColor);
+    document.documentElement.style.setProperty("--primary-color", primaryColor);
+    document.documentElement.style.setProperty("--secondary-color", secondaryColor);
+    document.documentElement.style.setProperty("--tertiary-color", tertiaryColor);
+    document.documentElement.style.setProperty("--text-color", textColor);
+    document.documentElement.style.setProperty("--box-shadow", boxShadow);
+
+    toggleThemeButton.firstElementChild.classList.remove("fa-sun");
+    toggleThemeButton.firstElementChild.classList.add("fa-moon");
+}
+
+function toggleDarkMode() {
+    primaryBackgroundColor = "#0e0d24";
+    primaryColor = "#2b2870";
+    secondaryColor = "#ffb703";
+    tertiaryColor = "#219ebc";
+    textColor = "#f3faf5";
+    boxShadow = "rgba(239, 238, 229, 0.1) 0px 4px 16px 0px, rgba(239, 238, 229, 0.05) 0px 8px 32px 0px";
+
+    document.documentElement.style.setProperty("--primary-backgroundcolor", primaryBackgroundColor);
+    document.documentElement.style.setProperty("--primary-color", primaryColor);
+    document.documentElement.style.setProperty("--secondary-color", secondaryColor);
+    document.documentElement.style.setProperty("--tertiary-color", tertiaryColor);
+    document.documentElement.style.setProperty("--text-color", textColor);
+    document.documentElement.style.setProperty("--box-shadow", boxShadow);
+
+    toggleThemeButton.firstElementChild.classList.remove("fa-moon");
+    toggleThemeButton.firstElementChild.classList.add("fa-sun");
+}
+
+function toggleTheme() {
+    if (isDarkMode) {
+        isDarkMode = false;
+        toggleLightMode();
+    } else {
+        isDarkMode = true;
+        toggleDarkMode();
+    }
+}
+
 function shuffle(array) {
     let currentIndex = array.length,
         randomIndex;

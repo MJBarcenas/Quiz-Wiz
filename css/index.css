@@ -1,21 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 :root {
+    /* COLORS */
     --primary-backgroundcolor: #f3faf5;
     --primary-color: #023047;
     --secondary-color: #219ebc;
     --tertiary-color: #ffb703;
     --text-color: #3c3c3c;
+    /* SIZES */
     --header-size: 2rem;
     --text-size: 1rem;
     --small-text-size: .8rem;
     --big-text-size: 3rem;
+    /* ROUNDNESS */
     --big-roundness: 8px;
     --xs-roundness: 4px;
+    /* DIFFICULTIES */
     --difficulty-easy: #1cb0f6;
     --difficulty-medium: #f89701;
     --difficulty-hard: #ff4b4b;
+    /* ANSWERS */
     --answer-correct: #58cc02;
     --answer-wrong: #ff4b4b;
+    /* BOX-SHADOW */
+    --box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px 0px, rgba(17, 17, 26, 0.05) 0px 8px 32px 0px;
 }
 
 * {
@@ -137,6 +144,11 @@ input[type=number] {
     background: #555;
 }
 
+.focusable {
+    transition-timing-function: ease-out;
+    transition: visibility 0.2s;
+}
+
 
 /* BODY */
 
@@ -148,6 +160,14 @@ input[type=number] {
     max-width: 1250px;
     padding: 1rem;
     margin: 0 auto;
+}
+
+
+/* BODY & HTML */
+
+body,
+html {
+    font-size: 16px;
 }
 
 
@@ -193,7 +213,6 @@ header {
 
 .nav-buttons>button:hover>i {
     color: var(--secondary-color);
-    opacity: .8;
 }
 
 
@@ -215,6 +234,10 @@ main {
     background-color: var(--primary-color);
     border-radius: var(--big-roundness);
     margin-top: auto;
+}
+
+.quiz-settings input[type="number"] {
+    max-width: 6.5rem;
 }
 
 .quiz-settings>div {
@@ -270,7 +293,7 @@ main {
 }
 
 .quiz-home span:last-child {
-    color: var(--difficulty-medium);
+    color: var(--tertiary-color);
 }
 
 
@@ -318,15 +341,15 @@ main {
     border-radius: var(--xs-roundness);
     border: none;
     outline: none;
-    color: var(--primary-backgroundcolor);
-    background-color: var(--secondary-color);
+    color: #f3faf5;
+    background-color: var(--primary-color);
     cursor: pointer;
     transition-timing-function: ease-out;
     transition: scale 0.2s;
 }
 
 .quiz-body .choices button:hover {
-    background-color: var(--tertiary-color);
+    background-color: var(--secondary-color);
 }
 
 .quiz-body .choices button:active {
@@ -392,7 +415,7 @@ main {
     transform: translate(50%, -50%);
     padding: 1rem;
     border-radius: var(--big-roundness);
-    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px 0px, rgba(17, 17, 26, 0.05) 0px 8px 32px 0px;
+    box-shadow: var(--box-shadow);
     max-width: 30rem;
 }
 
@@ -545,4 +568,81 @@ footer {
     flex: 0 1 fit-content;
     width: 100%;
     text-align: center;
+}
+
+@media only screen and (max-width: 560px) {
+     :root {
+        --header-size: 1.5rem;
+        --text-size: .9rem;
+        --small-text-size: .7rem;
+        --big-text-size: 2.5rem;
+    }
+    body,
+    html {
+        font-size: 14px;
+    }
+    .contacts {
+        width: 100%;
+        margin: 1rem 0;
+        display: flex;
+        justify-content: space-between;
+    }
+    .quiz-settings input[type="number"] {
+        max-width: 3rem;
+    }
+    .dropdown-button i {
+        display: none;
+    }
+    /* nav p {
+        display: none;
+    }
+    nav svg {
+        margin-top: 0;
+    }
+    .body .game-settings {
+        width: 100%;
+        padding: 0 0 0 1rem;
+    }
+    .body .game-settings input#mode:checked~#mode-input,
+    .body .game-settings input#word:checked~#word-input {
+        padding: 0 1rem 0 2rem
+    }
+    .body .game-settings label {
+        font-size: var(--small-text);
+    }
+    .paragraph mark {
+        font-size: var(--large-text);
+    }
+    .test-logs,
+    .history-container {
+        grid-template-columns: none;
+        grid-template-rows: auto 1fr;
+    }
+    .wpm_accuracy_text {
+        margin: 0 auto;
+        display: grid;
+        gap: 3rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .contacts {
+        width: 100%;
+        margin: 1rem 0;
+        display: flex;
+        justify-content: space-between;
+    }
+    #words-input {
+        width: 7rem;
+    }
+    .code-link {
+        width: 100%;
+    }
+    .message {
+        max-width: 10rem;
+    } */
+}
+
+@media only screen and (max-height: 460px) {
+    .whole {
+        height: 80vw;
+    }
 }
