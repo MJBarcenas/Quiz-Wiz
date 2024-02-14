@@ -211,7 +211,15 @@ header {
     cursor: pointer;
 }
 
-.nav-buttons>button:hover>i {
+.nav-buttons>button.active>i {
+    color: var(--tertiary-color);
+}
+
+.nav-buttons>button:not(:first-child):hover>i {
+    color: var(--tertiary-color);
+}
+
+.nav-buttons>button:first-child i {
     color: var(--secondary-color);
 }
 
@@ -273,8 +281,8 @@ main {
 .quiz-home {
     display: flex;
     align-items: center;
-    height: 50%;
     margin-bottom: auto;
+    height: 60%;
     text-align: center;
 }
 
@@ -301,8 +309,8 @@ main {
 
 .quiz-body {
     padding: 1rem;
+    height: 60%;
     margin-bottom: auto;
-    height: 50%;
     display: none;
     flex-direction: column;
     justify-content: space-between;
@@ -397,7 +405,7 @@ main {
 .quiz-summary {
     padding: 1rem;
     margin-bottom: auto;
-    height: 50%;
+    height: 60%;
     display: none;
     flex-direction: column;
     justify-content: space-between;
@@ -533,34 +541,6 @@ main {
 }
 
 
-/* .leaderboards .top-wizards {
-    height: 100;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.leaderboards .top-wizards .quiz-wizards {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    column-gap: 1rem;
-}
-
-.leaderboards .top-wizards .quiz-wizards p {
-    font-weight: bolder;
-}
-
-.leaderboards .top-wizards .quiz-wizards p:first-child {
-    grid-row: 1/3;
-    font-size: var(--big-text-size);
-    line-height: var(--big-text-size);
-    color: #58cc02;
-} */
-
-
 /* CONTACTS */
 
 .contacts {
@@ -607,7 +587,7 @@ footer {
 
 @media only screen and (max-width: 560px) {
      :root {
-        --header-size: 1.5rem;
+        --header-size: 1.2rem;
         --text-size: .9rem;
         --small-text-size: .7rem;
         --big-text-size: 2.5rem;
@@ -616,63 +596,34 @@ footer {
     html {
         font-size: 14px;
     }
-    .contacts {
-        width: 100%;
-        margin: 1rem 0;
-        display: flex;
-        justify-content: space-between;
+    .dropdown-button i {
+        display: none;
+    }
+    .quiz-home,
+    .quiz-body,
+    .quiz-summary {
+        height: 70%;
+        margin-bottom: 2rem;
+        padding: 1rem 0;
     }
     .quiz-settings input[type="number"] {
         max-width: 3rem;
     }
-    .dropdown-button i {
-        display: none;
-    }
-    /* nav p {
-        display: none;
-    }
-    nav svg {
-        margin-top: 0;
-    }
-    .body .game-settings {
-        width: 100%;
-        padding: 0 0 0 1rem;
-    }
-    .body .game-settings input#mode:checked~#mode-input,
-    .body .game-settings input#word:checked~#word-input {
-        padding: 0 1rem 0 2rem
-    }
-    .body .game-settings label {
-        font-size: var(--small-text);
-    }
-    .paragraph mark {
-        font-size: var(--large-text);
-    }
-    .test-logs,
-    .history-container {
-        grid-template-columns: none;
-        grid-template-rows: auto 1fr;
-    }
-    .wpm_accuracy_text {
-        margin: 0 auto;
-        display: grid;
-        gap: 3rem;
-        grid-template-columns: repeat(2, 1fr);
-    }
     .contacts {
         width: 100%;
         margin: 1rem 0;
         display: flex;
         justify-content: space-between;
     }
-    #words-input {
-        width: 7rem;
+    /* .quiz-body .choices {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
     }
-    .code-link {
-        width: 100%;
-    }
-    .message {
-        max-width: 10rem;
+    .quiz-body .choices * {
+        flex: 1 1 45%;
+        overflow-wrap: anywhere;
+        margin: .2rem;
     } */
 }
 
